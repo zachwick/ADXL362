@@ -30,8 +30,11 @@ public:
 	void begin(); 		
 	void beginMeasure(); 
 	int readXData();
+	byte readXMSB();
 	int readYData();
+	byte readYMSB();
 	int readZData();
+	byte readZMSB();
 	void readXYZTData(int XData, int YData, int ZData, int Temperature);
 	int readTemp();
 	

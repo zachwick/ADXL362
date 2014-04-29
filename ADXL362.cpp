@@ -71,16 +71,34 @@ int ADXL362::readXData(){
   return XDATA;
 }
 
+// Read only the most significant byte of X-axis data
+byte ADXL362::readXMSB() {
+	int XDATA = SPIreadOneRegister(0x08);
+	return XDATA;
+}
+
 int ADXL362::readYData(){
   int YDATA = SPIreadTwoRegisters(0x10);
   if (debugSerial) {Serial.print(  "\tYDATA = "); Serial.print(YDATA); }
   return YDATA;
 }
 
+// Read only the most significant byte of Y-axis data
+byte ADXL362::readYMSB() {
+	int YDATA = SPIreadOneRegister(0x09);
+	return YDATA;
+}
+
 int ADXL362::readZData(){
   int ZDATA = SPIreadTwoRegisters(0x12);
   if (debugSerial) {Serial.print(  "\tZDATA = "); Serial.print(ZDATA); }
   return ZDATA;
+}
+
+// Read only the most significant byte of Z-axis data
+byte ADXL362::readZMSB() {
+	int ZDATA = SPIreadOneRegister(0x0A);
+	return ZDATA;
 }
 
 int ADXL362::readTemp(){
