@@ -32,6 +32,7 @@ void ADXL362::begin() {
   pinMode(slaveSelectPin, OUTPUT);
   SPI.begin();
   SPI.setDataMode(SPI_MODE0);	//CPHA = CPOL = 0    MODE = 0
+  SPI.setClockDivider(SPI_CLOCK_DIV4); // Set the SPI bus to operate at 4MHz
   delay(1000);
     
   // soft reset
