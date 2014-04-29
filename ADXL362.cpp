@@ -16,7 +16,7 @@
 #include <ADXL362.h>
 #include <SPI.h>
 
-const int slaveSelectPin = 10;
+const int slaveSelectPin = 4;
 const bool debugSerial = 1;
 
 ADXL362::ADXL362() {
@@ -65,9 +65,20 @@ void ADXL362::beginMeasure() {
 //  readXData(), readYData(), readZData(), readTemp()
 //  Read X, Y, Z, and Temp registers
 //
-int ADXL362::readXData(){
+int ADXL362::readXData(int include_sx_bits){
   int XDATA = SPIreadTwoRegisters(0x0E);
-  if (debugSerial) {Serial.print(  "XDATA = "); Serial.print(XDATA); }
+
+  if (!include_sx_bits) {
+	  int sx_mask = 0xF000;
+	  XDATA &= (~sx_mask);
+  }
+
+  if (debugSerial) {
+	  Serial.print(  "XDATA = "); 
+	  Serial.print(String(XDATA, HEX));
+	  Serial.print("\n");
+  }
+
   return XDATA;
 }
 
@@ -77,9 +88,20 @@ byte ADXL362::readXMSB() {
 	return XDATA;
 }
 
-int ADXL362::readYData(){
+int ADXL362::readYData(int include_sx_bits){
   int YDATA = SPIreadTwoRegisters(0x10);
-  if (debugSerial) {Serial.print(  "\tYDATA = "); Serial.print(YDATA); }
+
+  if (!include_sx_bits) {
+	  int sx_mask = 0xF000;
+	  YDATA &= (~sx_mask);
+  }
+
+  if (debugSerial) {
+	  Serial.print(  "YDATA = ");
+	  Serial.print(String(YDATA, HEX));
+	  Serial.print("\n");
+  }
+
   return YDATA;
 }
 
@@ -89,9 +111,20 @@ byte ADXL362::readYMSB() {
 	return YDATA;
 }
 
-int ADXL362::readZData(){
+int ADXL362::readZData(int include_sx_bits){
   int ZDATA = SPIreadTwoRegisters(0x12);
-  if (debugSerial) {Serial.print(  "\tZDATA = "); Serial.print(ZDATA); }
+
+  if (!include_sx_bits) {
+	  int sx_mask = 0xF000;
+	  ZDATA &= (~sx_mask);
+  }
+
+  if (debugSerial) {
+	  Serial.print("ZDATA = ");
+	  Serial.print(String(ZDATA, HEX));
+	  Serial.print("\n");
+  }
+
   return ZDATA;
 }
 
