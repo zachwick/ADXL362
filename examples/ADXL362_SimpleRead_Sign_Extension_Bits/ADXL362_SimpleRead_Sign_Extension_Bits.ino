@@ -37,10 +37,10 @@ void loop(){
       data misinterpretation.
     */
   
-    // X, Y, and Z axis data without the sign extension bits.
-    int X,Y,Z;
-    // "Raw" X, Y, and Z axis data with the sign extension bits intact.    
-    int sx_X, sx_Y, sx_Z;
+    // X axis, Y axis, Z axis, and Temp data without the sign extension bits.
+    int X,Y,Z,T;
+    // "Raw" X axis, Y axis, Z axis, and Temp data with the sign extension bits intact.    
+    int sx_X, sx_Y, sx_Z, sx_T;
     
     // Read the X-axis register and mask out the sign extension bits.
     X = xl.readXData(0);
@@ -56,6 +56,11 @@ void loop(){
     Z = xl.readZData(0);	 
     // Read the Z-axis register and keep the sign extension bits present
     sx_Z = xl.readZData(1);
+    
+    // Reat the Temperature register and mask out the sign extension bits.
+    T = xl.readTemp(0);
+    // Read the Temperature register and keep the sign extension bits present
+    sx_T = xl.readTemp(1);
 
     Serial.print("\n");    
     delay(100);                // Arbitrary delay to make serial monitor easier to observe

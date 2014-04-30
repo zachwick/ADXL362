@@ -134,9 +134,20 @@ byte ADXL362::readZMSB() {
 	return ZDATA;
 }
 
-int ADXL362::readTemp(){
+int ADXL362::readTemp(int include_sx_bits){
   int TEMP = SPIreadTwoRegisters(0x14);
-  if (debugSerial) {Serial.print("\tTEMP = "); Serial.print(TEMP); }
+
+  if (!include_sx_bits) {
+	  int sx_mask = 0xF000;
+	  TEMP &= (~sx_mask);
+  }
+
+  if (debugSerial) {
+	  Serial.print("\tTEMP = "); 
+	  Serial.print(TEMP); 
+	  Serial.print("\n");
+  }
+
   return TEMP;
 }
 

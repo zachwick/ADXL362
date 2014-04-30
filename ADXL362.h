@@ -119,8 +119,12 @@ public:
 	 * NB: The returned 16 bit integer has 4 sign extension bits as the four
 	 *     most significant bits. These four bits are always the same as the
 	 *     most significant bit of actual data.
+	 *
+	 * @param include_sx_bits If true, then the sign extension bits are included
+	 *        in the returned value. If false, then the sign extension bits are
+	 *        masked out of the returned value.
 	 */
-	int readTemp();
+	int readTemp( int include_sx_bits );
 
 
 	//
