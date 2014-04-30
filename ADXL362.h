@@ -133,7 +133,9 @@ class ADXL362
 {
 public:
 
+	ADXL362( void );
 	ADXL362( int cs_pin );
+	ADXL362( int cs_pin, boolean debugSerial );
 
 	/**
 	 * The basic initialization and configuration of the ADXL362
@@ -286,6 +288,7 @@ public:
 	
 private:
 	int _pin;
+	boolean _debug;
 };
 
 #endif

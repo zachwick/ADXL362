@@ -23,9 +23,22 @@
 #include <ADXL362.h>
 #include <SPI.h>
 
-ADXL362::ADXL362( int cs_pin ) {
-	pinMode (cs_pin, OUTPUT);
+ADXL362::ADXL362(void) {
+	_pin = 4;
+	_debug = false;
+	pinMode (_pin, OUTPUT);
+}
+
+ADXL362::ADXL362(int cs_pin) {
 	_pin = cs_pin;
+	_debug = false;
+	pinMode (_pin, OUTPUT);
+}
+
+ADXL362::ADXL362(int cs_pin, boolean debugSerial) {
+	_pin = cs_pin;
+	_debug = debugSerial;
+	pinMode (_pin, OUTPUT);
 }
 
 void
@@ -40,6 +53,11 @@ ADXL362::begin(void) {
     
 	// ADXL362's reset is writing ASCII "R" to 0x1F
 	write_single_register (SOFT_RESET, 0x52);
+
+	if (_debug) {
+		Serial.print ("Soft Reset\n");
+	}
+
 	delay (10);
 }
 
@@ -48,6 +66,14 @@ ADXL362::beginMeasure(void) {
 	byte temporary = read_single_register (POWER_CTL);
 	byte tempwrite = temporary | MEASURE_MODE_ON;
 	write_single_register (POWER_CTL, tempwrite);
+	
+	if (_debug) {
+		Serial.print ("MEASURE_MODE_ON ");
+		Serial.print ("POWER_CTL written as: ");
+		Serial.print (String (tempwrite, HEX));
+		Serial.print ("\n");
+	}
+	
 	delay (10);	
 }
 
@@ -60,12 +86,25 @@ ADXL362::readXData(int include_sx_bits) {
 		xdata &= (~sx_mask);
 	}
 
+	if (_debug) {
+		Serial.print ("X-axis: ");
+		Serial.print (String(xdata, HEX));
+		Serial.print ("\n");
+	}
+
 	return xdata;
 }
 
 byte
 ADXL362::readXMSB(void) {
 	int xdata = read_single_register (XDATA);
+
+	if (_debug) {
+		Serial.print ("X-axis MSB: ");
+		Serial.print (String(xdata, HEX));
+		Serial.print ("\n");
+	}	
+
 	return xdata;
 }
 
@@ -78,12 +117,25 @@ ADXL362::readYData(int include_sx_bits) {
 		ydata &= (~sx_mask);
 	}
 
+	if (_debug) {
+		Serial.print ("Y-axis: ");
+		Serial.print (String(ydata, HEX));
+		Serial.print ("\n");
+	}
+
 	return ydata;
 }
 
 byte
 ADXL362::readYMSB(void) {
 	int ydata = read_single_register (YDATA);
+
+	if (_debug) {
+		Serial.print ("Y-axis MSB: ");
+		Serial.print (String(ydata, HEX));
+		Serial.print ("\n");
+	}
+
 	return ydata;
 }
 
@@ -96,12 +148,25 @@ ADXL362::readZData(int include_sx_bits) {
 		zdata &= (~sx_mask);
 	}
 
+	if (_debug) {
+		Serial.print ("Z-axis: ");
+		Serial.print (String(zdata, HEX));
+		Serial.print ("\n");
+	}
+	
 	return zdata;
 }
 
 byte
 ADXL362::readZMSB(void) {
 	int zdata = read_single_register (ZDATA);
+
+	if (_debug) {
+		Serial.print ("Z-axis MSB: ");
+		Serial.print (String(zdata, HEX));
+		Serial.print ("\n");
+	}
+
 	return zdata;
 }
 
@@ -112,6 +177,12 @@ ADXL362::readTemp(int include_sx_bits) {
 	if (!include_sx_bits) {
 		int sx_mask = 0xF000;
 		temperature &= (~sx_mask);
+	}
+
+	if (_debug) {
+		Serial.print ("Temperature: ");
+		Serial.print (String(temperature, HEX));
+		Serial.print ("\n");
 	}
 
 	return temperature;
@@ -166,16 +237,32 @@ ADXL362::readXYZTData(int &XData, int &YData, int &ZData, int &Temperature, int 
 void
 ADXL362::set_filter_ctl (byte settings_mask) {
 	write_single_register(byte(FILTER_CTL), byte(settings_mask));
+
+	if (_debug) {
+		Serial.print ("FILTER_CTL written as: ");
+		Serial.print (String (byte(settings_mask),HEX));
+		Serial.print ("\n");
+	}
 }
 
 void
 ADXL362::set_power_ctl (byte settings_mask) {
 	write_single_register ((byte)POWER_CTL, (byte)settings_mask);
+
+	if (_debug) {
+		Serial.print ("POWER_CTL written as: ");
+		Serial.print (String (byte(settings_mask),HEX));
+		Serial.print ("\n");
+	}
 }
 
 void
 ADXL362::do_self_test (void) {
 	write_single_register ((byte)SELF_TEST, (byte)SELF_TEST_ON);
+
+	if (_debug) {
+		Serial.print ("Triggering SELF_TEST\n");
+	}
 }
 
 byte
@@ -188,6 +275,14 @@ ADXL362::read_single_register(byte address) {
 	value = SPI.transfer (0x00);
 	digitalWrite (_pin, HIGH);
 
+	if (_debug) {
+		Serial.print ("READING Address: ");
+		Serial.print (String (address,HEX));
+		Serial.print (" Value: ");
+		Serial.print (String (value,HEX));
+		Serial.print ("\n");
+	}
+
 	return value;
 }
 
@@ -199,6 +294,14 @@ ADXL362::write_single_register(byte address, byte value) {
 	SPI.transfer (address);
 	SPI.transfer (value);
 	digitalWrite (_pin, HIGH);
+
+	if (_debug) {
+		Serial.print ("WRITING Address: ");
+		Serial.print (String (address,HEX));
+		Serial.print (" Value: ");
+		Serial.print (String (value,HEX));
+		Serial.print ("\n");
+	}
 }
 
 int
@@ -212,6 +315,16 @@ ADXL362::read_multiple_registers(byte address) {
 	value_l = SPI.transfer (0x00);
 	value_h = SPI.transfer (0x00);
 	digitalWrite (_pin, HIGH);
+
+	if (_debug) {
+		Serial.print ("READING Address: ");
+		Serial.print (String (address,HEX));
+		Serial.print (" Value LOW BYTE: ");
+		Serial.print (String (value_l,HEX));
+		Serial.print (" Value HIGH BYTE: ");
+		Serial.print (String (value_h,HEX));
+		Serial.print ("\n");
+	}
 
 	return value_l + (value_h << 8);
 }
