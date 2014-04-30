@@ -5,7 +5,7 @@
  * sign extension bits.
  * Go to http://www.analog.com/ADXL362 for datasheet
  *
- * License: GNU GPLv3 or later
+ * License: CC BY-SA
  * Copyright 2014 zachwick <zach@zachwick.com>
  *
  * Connect SCLK, MISO, MOSI, and CSB of ADXL362 to
@@ -17,14 +17,18 @@
 #include <SPI.h>
 #include <ADXL362.h>
 
-ADXL362 xl;
+ADXL362 xl = ADXL362(4);
 
 void setup(){
     Serial.begin(9600);
     xl.begin();                   // Setup SPI protocol, issue device soft reset
-    xl.beginMeasure();            // Switch ADXL362 to measure mode  
-    xl.checkAllControlRegs();     // Burst Read all Control Registers, to check for proper setup
-	
+    Serial.println(String(RANGE_2G | HALF_BW_QTR | ODR_12_5_HZ,HEX));
+    xl.set_filter_ctl (RANGE_2G | HALF_BW_QTR | ODR_12_5_HZ);
+    xl.set_power_ctl (LOW_NOISE_ULTRA_LOW);
+    xl.beginMeasure();            // Switch ADXL362 to measure mode
+    
+    Serial.println(String(xl.read_single_register(FILTER_CTL),HEX));
+    Serial.println(String(xl.read_single_register(POWER_CTL),HEX));
     Serial.print("\n\nBegin Loop Function:\n");
 }
 
@@ -47,10 +51,22 @@ void loop(){
     // to the same sample time
     xl.readXYZTData(X,Y,Z,Temp,0);
     
+    Serial.print("X: ");
+    Serial.print(String(X,HEX));
+    Serial.print(" ");
+    Serial.print("Y: ");
+    Serial.print(String(Y,HEX));
+    Serial.print(" ");
+    Serial.print("Z: ");
+    Serial.print(String(Z,HEX));
+    Serial.print(" ");
+    Serial.print("T: ");
+    Serial.print(String(Temp,HEX));
+    Serial.print("\n");
     // Read all data registers and include the sign extension bits
-    xl.readXYZTData(X,Y,Z,Temp,1);
+    //xl.readXYZTData(X,Y,Z,Temp,1);
     
     Serial.print("\n");    
-    delay(100);                // Arbitrary delay to make serial monitor easier to observe
+    delay(60);                // Arbitrary delay to make serial monitor easier to observe
 }
 

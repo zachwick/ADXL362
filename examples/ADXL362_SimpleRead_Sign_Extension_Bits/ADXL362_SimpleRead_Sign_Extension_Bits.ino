@@ -5,7 +5,7 @@
  * sign extension bits.
  * Go to http://www.analog.com/ADXL362 for datasheet
  *
- * License: GNU GPLv3 or later
+ * License: CC BY-SA
  * Copyright 2014 zachwick <zach@zachwick.com>
  *
  * Connect SCLK, MISO, MOSI, and CSB of ADXL362 to
