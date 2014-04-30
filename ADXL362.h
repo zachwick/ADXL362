@@ -111,7 +111,7 @@ public:
 	 * extension bits however are masked to 0 before the data is returned by
 	 * reference, so the resulting data is the "true" values of the axis' data.
 	 */
-	void readXYZTData(int XData, int YData, int ZData, int Temperature);
+	void readXYZTData(int &XData, int &YData, int &ZData, int &Temperature, int include_sx_bits);
 
 	/**
 	 * This method reads the temperature data register.

@@ -140,30 +140,60 @@ int ADXL362::readTemp(){
   return TEMP;
 }
 
-void ADXL362::readXYZTData(int XData, int YData, int ZData, int Temperature){
-  
-  // burst SPI read
-  // A burst read of all three axis is required to guarantee all measurements correspond to same sample time
-  digitalWrite(slaveSelectPin, LOW);
-  SPI.transfer(0x0B);  // read instruction
-  SPI.transfer(0x0E);  // Start at XData Reg
-  XData = SPI.transfer(0x00);
-  XData = XData + (SPI.transfer(0x00) << 8);
-  YData = SPI.transfer(0x00);
-  YData = YData + (SPI.transfer(0x00) << 8);
-  ZData = SPI.transfer(0x00);
-  ZData = ZData + (SPI.transfer(0x00) << 8);
-  Temperature = SPI.transfer(0x00);
-  Temperature = Temperature + (SPI.transfer(0x00) << 8);
-  digitalWrite(slaveSelectPin, HIGH);
-  
-  if (debugSerial) {
-	Serial.print(  "XDATA = "); Serial.print(XData); 
-	Serial.print(  "\tYDATA = "); Serial.print(YData); 
-	Serial.print(  "\tZDATA = "); Serial.print(ZData); 
-	Serial.print(  "\tTemperature = "); Serial.println(Temperature);
-	}
+void ADXL362::readXYZTData(int &XData, int &YData, int &ZData, int &Temperature, int include_sx_bits){
+  	byte x_l, x_h, y_l, y_h, z_l, z_h;
+	byte temp_l, temp_h;
+	// The actual X,Y,Z axis data is only 12 bits. The remaining 4 bits are "sign
+	// extension" bits and are always equal to the most significant bit.
+	// They are masked to zero so as to return the correct value back by reference.
+	byte sx_mask = 0xF0;
 
+	// burst SPI read
+	// A burst read of all three axis is required to guarantee all measurements correspond to same sample time
+	digitalWrite(slaveSelectPin, LOW);
+	SPI.transfer(0x0B);  // read instruction
+	SPI.transfer(0x0E);  // Start at XData Reg
+
+	x_l = SPI.transfer(0x00);
+	x_h = SPI.transfer(0x00);
+	if (!include_sx_bits) {
+		x_h &= (~sx_mask);
+	}
+	XData = x_l + (x_h << 8);
+
+	y_l = SPI.transfer(0x00);
+	y_h = SPI.transfer(0x00);
+	if (!include_sx_bits) {
+		y_h &= (~sx_mask);
+	}
+	YData = y_l + (y_h <<  8);
+
+	z_l = SPI.transfer(0x00);
+	z_h = SPI.transfer(0x00);
+	if (!include_sx_bits) {
+		z_h &= (~sx_mask);
+	}
+	ZData = z_l + (z_h << 8);
+
+	temp_l = SPI.transfer(0x00);
+	temp_h = SPI.transfer(0x00);
+	if (!include_sx_bits) {
+		temp_h &= (~sx_mask);
+	}
+	Temperature = temp_l + (temp_h << 8);
+
+	digitalWrite(slaveSelectPin, HIGH);
+  
+	if (debugSerial) {
+		Serial.print("x_l: "); Serial.print(String(x_l, HEX)); Serial.print(" ");
+		Serial.print("x_h: "); Serial.print(String(x_h, HEX)); Serial.print(" "); Serial.print("\n");
+		Serial.print("y_l: "); Serial.print(String(y_l, HEX)); Serial.print(" ");
+		Serial.print("y_h: "); Serial.print(String(y_h, HEX)); Serial.print(" "); Serial.print("\n");
+		Serial.print("z_l: "); Serial.print(String(z_l, HEX)); Serial.print(" ");
+		Serial.print("z_h: "); Serial.print(String(z_h, HEX)); Serial.print(" "); Serial.print("\n");
+		Serial.print("temp_l: "); Serial.print(String(temp_l, HEX)); Serial.print(" ");
+		Serial.print("temp_h: "); Serial.print(String(temp_h, HEX)); Serial.print(" "); Serial.print("\n");
+	}
 }
 
 
